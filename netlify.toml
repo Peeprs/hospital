@@ -1,0 +1,13 @@
+[build]
+  # Directorio donde está tu index.html
+  publish = "public"
+  
+  # Directorio donde están tus funciones
+  functions = "netlify/functions"
+
+[[redirects]]
+  # Redirige todas las llamadas a /api/*
+  # a tu función 'api.js'
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200

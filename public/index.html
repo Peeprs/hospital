@@ -1,0 +1,256 @@
+﻿
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Prueba Examen</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <style>
+        .card-body h5,
+        .card-body h4 {
+            margin-top: 0 !important;
+            margin-bottom: 4px !important;
+        }
+
+        .card-body {
+            padding-top: 10px !important;
+            padding-bottom: 5px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container min-vh-100 py-3 d-flex flex-column">
+        <div class="text-center mb-3">
+            <h3>Registro de Usuarios del Hospital Juarez</h3>
+        </div>
+
+        <div class="row flex-grow-1 g-3">
+            <div class="col-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h4>Registro de Usuarios</h4>
+                        <form id="registroForm" class="d-flex flex-column flex-grow-1">
+                            <div class="mb-1">
+                                <label for="name">Nombre:</label>
+                                <input type="text" id="name" name="name" class="form-control" placeholder="Ingrese su nombre" required />
+                            </div>
+                            <div class="mb-1">
+                                <label for="email">Correo:</label>
+                                <input type="email" id="email" name="email" class="form-control" placeholder="Ingrese su correo"
+                                        required/>
+                            </div>
+                            <div class="row mb-1">
+                                <div class="col-md-6">
+                                    <label for="telefono">Telefono:</label>
+                                    <input type="tel" id="telefono" name="telefono" class="form-control" placeholder="Numero de telefono" 
+                                           pattern="^\d{1,10}$" maxlength="10" required />
+                                           
+                                </div>
+                                <div class="mb-1 col-md-6">
+                                    <label for="fechaN">Fecha de Nacimiento</label>
+                                    <input type="date" id="fechaN" name="fechaN" class="form-control" required/>
+                                </div>
+                            </div>
+                            <div class="row mb-1">
+                                <div class="col-md-6">
+                                    <label for="genero">Genero:</label>
+                                    <select id="genero" name="genero" class="form-select">
+                                        <option value="" disabled selected>Seleccionar</option>
+                                        <option value="male">Hombre</option>
+                                        <option value="female">Mujer</option>
+                                        <option value="anything">Otros</option>
+                                    </select>
+                                </div>
+                            <div class="mb-1 col-md-6">
+                                <label for="rfc">RFC *</label>
+                                <input type="text" id="rfc" name="rfc" class="form-control" placeholder="Introduce tu RFC" required
+                                      pattern="^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$" maxlength="13" />
+                            </div>
+                            </div>
+                            <div>
+                            <button type="submit" class="btn btn-primary">Registrar</button>
+                            </div>
+                        </form>
+                        <div class="success-message text-center d-none" id="successMessage">Formulario enviado correctamente</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-8 d-flex flex-column">
+                <div class="card shadow-sm" style="height: 100%;">
+                    <div class="card-body p-1">
+                        <h5 class="text-center">Tabla Dinamica</h5>
+                        <div class="flex-grow-1 overflow-auto">
+                            <table class="table table-striped table-hover" id="tabla">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Teléfono</th>
+                                        <th>Género</th>
+                                        <th>Acciones</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaResultados">
+                                    <tr>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+const tabla = document.querySelector("#tablaResultados");
+const form = document.getElementById("registroForm");
+const mensajeExito = document.getElementById('successMessage');
+const btnEnviar = form.querySelector('button[type="submit"]');
+const contenedorBotones = btnEnviar.parentElement;
+
+contenedorBotones.classList.add('d-flex');
+btnEnviar.classList.add('flex-grow-1');
+
+// Botón cancelar
+const btnCancelar = document.createElement('button');
+btnCancelar.type = 'button';
+btnCancelar.className = 'btn btn-secondary ms-2 flex-grow-1';
+btnCancelar.style.display = 'none';
+btnCancelar.textContent = 'Cancelar edición';
+contenedorBotones.appendChild(btnCancelar);
+
+let filaEnEdicion = null;
+
+// 🔄 API base
+const API_URL = "/api/users";
+
+// 📥 Cargar registros desde MongoDB
+async function cargarUsuarios() {
+  tabla.innerHTML = `<tr><td colspan="6" class="text-center">Cargando...</td></tr>`;
+  try {
+    const res = await fetch(API_URL);
+    const usuarios = await res.json();
+    mostrarTabla(usuarios);
+  } catch (err) {
+    tabla.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error al cargar usuarios</td></tr>`;
+  }
+}
+
+// 📤 Enviar datos al backend
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const usuario = {
+    name: document.getElementById("name").value.trim(),
+    email: document.getElementById("email").value.trim(),
+    telefono: document.getElementById("telefono").value.trim(),
+    genero: document.getElementById("genero").value,
+    fechaN: document.getElementById("fechaN").value,
+    rfc: document.getElementById("rfc").value.trim()
+  };
+
+  // Validar campos
+  if (!usuario.name || !usuario.email || !usuario.telefono || !usuario.genero || !usuario.fechaN || !usuario.rfc) {
+    mensajeExito.textContent = "❗ Llena todos los campos antes de enviar";
+    mensajeExito.classList.remove('d-none');
+    return;
+  }
+
+  try {
+    if (filaEnEdicion) {
+      // PUT (editar)
+      await fetch(`${API_URL}/${filaEnEdicion}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(usuario)
+      });
+      filaEnEdicion = null;
+      btnCancelar.style.display = 'none';
+      btnEnviar.textContent = 'Registrar';
+    } else {
+      // POST (nuevo)
+      await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(usuario)
+      });
+    }
+
+    form.reset();
+    mensajeExito.textContent = "Guardado correctamente ✅";
+    mensajeExito.classList.remove('d-none');
+    setTimeout(() => mensajeExito.classList.add('d-none'), 2000);
+
+    cargarUsuarios();
+  } catch (err) {
+    mensajeExito.textContent = "❌ Error al guardar";
+    mensajeExito.classList.remove('d-none');
+  }
+});
+
+// 🗑️ Eliminar
+async function eliminar(id) {
+  if (!confirm("¿Eliminar este registro?")) return;
+  await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+  cargarUsuarios();
+}
+
+// ✏️ Editar
+function editar(id, user) {
+  document.getElementById("name").value = user.name;
+  document.getElementById("email").value = user.email;
+  document.getElementById("telefono").value = user.telefono;
+  document.getElementById("genero").value = user.genero;
+  document.getElementById("fechaN").value = user.fechaN ? user.fechaN.substring(0,10) : "";
+  document.getElementById("rfc").value = user.rfc;
+
+  filaEnEdicion = id;
+  btnCancelar.style.display = 'inline-block';
+  btnEnviar.textContent = 'Guardar cambios';
+}
+
+// Cancelar edición
+btnCancelar.addEventListener('click', () => {
+  form.reset();
+  filaEnEdicion = null;
+  btnCancelar.style.display = 'none';
+  btnEnviar.textContent = 'Registrar';
+  mensajeExito.classList.add('d-none');
+});
+
+// 🧾 Mostrar tabla
+function mostrarTabla(usuarios) {
+  tabla.innerHTML = "";
+  if (usuarios.length === 0) {
+    tabla.innerHTML = `<tr><td colspan="6" class="text-center">No hay registros para mostrar.</td></tr>`;
+    return;
+  }
+
+  usuarios.forEach((u) => {
+    const fila = document.createElement("tr");
+    fila.innerHTML = `
+      <td>${u._id}</td>
+      <td>${u.name}</td>
+      <td>${u.email}</td>
+      <td>${u.telefono}</td>
+      <td>${u.genero}</td>
+      <td>
+        <button class="btn btn-warning btn-sm" onclick='editar("${u._id}", ${JSON.stringify(u)})'>Editar</button>
+        <button class="btn btn-danger btn-sm ms-1" onclick='eliminar("${u._id}")'>Eliminar</button>
+      </td>
+    `;
+    tabla.appendChild(fila);
+  });
+}
+
+// 🚀 Inicializar
+cargarUsuarios();
+</script>
