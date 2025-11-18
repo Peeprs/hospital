@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 
 // Importar tus rutas CRUD
 import userRoutes from '../../server/routers/users.js';
+import router from '../../server/routers/users.js';
 
 // Cargar variables de entorno
 // Netlify las proveerá desde su UI, pero esto es para desarrollo local
@@ -44,7 +45,7 @@ const connectDB = async () => {
 // --- Rutas ---
 // Esta es la clave: le decimos a Express que use nuestras rutas
 // bajo el prefijo /api/users
-app.use('/api/users', userRoutes);
+app.use('/api/users', router);
 
 // Ruta base
 app.get("/api", (req, res) => {
