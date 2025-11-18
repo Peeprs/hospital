@@ -1,11 +1,11 @@
-// netlify/functions/api.cjs
+// netlify/functions/api.js
 const express = require("express");
 const mongoose = require("mongoose");
 const serverless = require("serverless-http");
 const cors = require("cors");
 const dotenv = require("dotenv");
 
-const router = require("../../server/routers/users.cjs");
+const router = require("../../server/routers/users.js"); // ← CORREGIDO
 
 dotenv.config();
 
