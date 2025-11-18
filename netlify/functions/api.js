@@ -5,8 +5,14 @@ const serverless = require("serverless-http");
 const cors = require("cors");
 const dotenv = require("dotenv");
 
+<<<<<<< HEAD
 // Importar rutas (ahora CJS)
 const router = require("../../server/routers/users.js");
+=======
+// Importar tus rutas CRUD
+
+import router from '../../server/routers/users.js';
+>>>>>>> da44780ee8532cb655534f9afd70810c41ac1cea
 
 dotenv.config();
 
