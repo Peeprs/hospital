@@ -6,7 +6,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 // Importar tus rutas CRUD
-import userRoutes from '../../server/routers/userRoutes.js';
+import userRoutes from '../../server/routers/users.js';
 
 // Cargar variables de entorno
 // Netlify las proveerá desde su UI, pero esto es para desarrollo local
