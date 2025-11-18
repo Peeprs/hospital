@@ -1,10 +1,9 @@
-import express from "express";
-import User from "../models/user.js"; // Asegúrate que la 'U' sea minúscula como tu archivo
+const express = require("express");
+const User = require("../models/user.js");
 
 const router = express.Router();
 
-// 1. READ (GET) - Obtener todos los usuarios
-router.get('/', async (req, res) => { // <-- CORREGIDO (era requestAnimationFrame)
+router.get("/", async (req, res) => {
   try {
     const users = await User.find();
     res.json(users);
@@ -13,8 +12,7 @@ router.get('/', async (req, res) => { // <-- CORREGIDO (era requestAnimationFram
   }
 });
 
-// 2. CREATE (POST) - Crear un nuevo usuario
-router.post('/', async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const nuevoUsuario = new User(req.body);
     const guardado = await nuevoUsuario.save();
@@ -24,14 +22,12 @@ router.post('/', async (req, res) => {
   }
 });
 
-// 3. UPDATE (PUT) - Actualizar un usuario por ID
-// ¡ESTA ES LA RUTA QUE FALTABA!
-router.put('/:id', async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const usuarioActualizado = await User.findByIdAndUpdate(
-      req.params.id, 
-      req.body, 
-      { new: true, runValidators: true } // new:true devuelve el doc actualizado
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
     );
     if (!usuarioActualizado) {
       return res.status(404).json({ message: "Usuario no encontrado" });
@@ -42,11 +38,9 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-
-// 4. DELETE (DELETE) - Eliminar usuario por ID
-router.delete('/:id', async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
-    const usuarioEliminado = await User.findByIdAndDelete(req.params.id); // <-- CORREGIDO
+    const usuarioEliminado = await User.findByIdAndDelete(req.params.id);
     if (!usuarioEliminado) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
@@ -56,4 +50,4 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;
