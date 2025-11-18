@@ -6,6 +6,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 // Importar tus rutas CRUD
+
 import router from '../../server/routers/users.js';
 
 // Cargar variables de entorno
