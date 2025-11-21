@@ -1,3 +1,6 @@
+//  Esta clase solo se encarfa de definir la forma de los datos y sus reglas
+// si intentas guardar datos que no cumplen con las reglas, te dara error
+
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({

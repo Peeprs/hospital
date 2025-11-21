@@ -129,26 +129,26 @@ contenedorBotones.appendChild(btnCancelar);
 
 let filaEnEdicion = null;
 
-// 🔄 API base
+// API base necesaria para la comunicacion del front con el back
 const API_URL = "/api/users";
 
-// 📥 Cargar registros desde MongoDB
+// Cargar registros desde MongoDB
 async function cargarUsuarios() {
   tabla.innerHTML = `<tr><td colspan="6" class="text-center">Cargando...</td></tr>`;
   try {
-    const res = await fetch(API_URL);
-    const usuarios = await res.json();
+    const res = await fetch(API_URL); // Le pide a la API que traiga todos los usuarios
+    const usuarios = await res.json(); // Al traer el JSON lo convierte en objeto colocados en la tabla
     mostrarTabla(usuarios);
   } catch (err) {
     tabla.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error al cargar usuarios</td></tr>`;
   }
 }
 
-// 📤 Enviar datos al backend
+// Enviar datos al backend
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const usuario = {
+  const usuario = { // Recoge los datos del formulario y es guardado en el objeto usuario
     name: document.getElementById("name").value.trim(),
     email: document.getElementById("email").value.trim(),
     telefono: document.getElementById("telefono").value.trim(),
@@ -164,47 +164,47 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  try {
+  try { // Intenta enviar los datos al backend
     if (filaEnEdicion) {
       // PUT (editar)
-      await fetch(`${API_URL}/${filaEnEdicion}`, {
+      await fetch(`${API_URL}/${filaEnEdicion}`, { // Le pide a la API que edite el usuario
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(usuario)
       });
-      filaEnEdicion = null;
+      filaEnEdicion = null; // Limpia la fila de edicion
       btnCancelar.style.display = 'none';
       btnEnviar.textContent = 'Registrar';
     } else {
       // POST (nuevo)
-      await fetch(API_URL, {
-        method: "POST",
+      await fetch(API_URL, { // Le pide a la API que guarde el usuario
+        method: "POST", // Crea un nuevo usuario con los datos
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(usuario)
       });
     }
 
-    form.reset();
-    mensajeExito.textContent = "Guardado correctamente ✅";
+    form.reset(); // Limpia el formulario y muestra el mensaje de exito
+    mensajeExito.textContent = "Guardado correctamente";
     mensajeExito.classList.remove('d-none');
     setTimeout(() => mensajeExito.classList.add('d-none'), 2000);
 
-    cargarUsuarios();
+    cargarUsuarios(); // Carga los usuarios de la base de datos
   } catch (err) {
-    mensajeExito.textContent = "❌ Error al guardar";
+    mensajeExito.textContent = "Error al guardar";
     mensajeExito.classList.remove('d-none');
   }
 });
 
-// 🗑️ Eliminar
-async function eliminar(id) {
+// Eliminar
+async function eliminar(id) { // Le pide a la API que elimine el usuario
   if (!confirm("¿Eliminar este registro?")) return;
-  await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-  cargarUsuarios();
+  await fetch(`${API_URL}/${id}`, { method: "DELETE" }); // Lo recibe la API y lo elimina
+  cargarUsuarios(); // Vuelve a cargar los usuarios
 }
 
-// ✏️ Editar
-function editar(id, user) {
+// Editar
+function editar(id, user) { // Le pide a la API que edite el usuario
   document.getElementById("name").value = user.name;
   document.getElementById("email").value = user.email;
   document.getElementById("telefono").value = user.telefono;
@@ -212,7 +212,7 @@ function editar(id, user) {
   document.getElementById("fechaN").value = user.fechaN ? user.fechaN.substring(0,10) : "";
   document.getElementById("rfc").value = user.rfc;
 
-  filaEnEdicion = id;
+  filaEnEdicion = id; // Guarda el id de la fila que se edita
   btnCancelar.style.display = 'inline-block';
   btnEnviar.textContent = 'Guardar cambios';
 }
@@ -226,7 +226,7 @@ btnCancelar.addEventListener('click', () => {
   mensajeExito.classList.add('d-none');
 });
 
-// 🧾 Mostrar tabla
+// Mostrar tabla
 function mostrarTabla(usuarios) {
   tabla.innerHTML = "";
   if (usuarios.length === 0) {
@@ -251,6 +251,6 @@ function mostrarTabla(usuarios) {
   });
 }
 
-// 🚀 Inicializar
+// Inicializar
 cargarUsuarios();
 </script>
