@@ -10,6 +10,8 @@ const User = require("../models/user.js"); // Crea el modelo usando las reglas d
 
 const router = express.Router(); // Crea una pequeña ventanilla para que el cliente pueda acceder sin cargar todo el servidor
 
+
+//GET
 router.get("/", async (req, res) => { // Oye quiere que leas todos los usuarios
   try {
     const users = await User.find(); // Buscando todos los usuarios
@@ -19,6 +21,7 @@ router.get("/", async (req, res) => { // Oye quiere que leas todos los usuarios
   }
 });
 
+// POST
 router.post("/", async (req, res) => { // Oye quieres que guarde un nuevo usuario
   try {
     const nuevo = new User(req.body); // Crea un nuevo usuario con los datos recibidos del formulario
@@ -29,6 +32,7 @@ router.post("/", async (req, res) => { // Oye quieres que guarde un nuevo usuari
   }
 });
 
+// GET ID
 router.put("/:id", async (req, res) => { // Oye quieres que actualice un usuario
   try {
     const actualizado = await User.findByIdAndUpdate( // Buscare al usuario que me pides
@@ -42,6 +46,7 @@ router.put("/:id", async (req, res) => { // Oye quieres que actualice un usuario
   }
 });
 
+// DELETE
 router.delete("/:id", async (req, res) => { // Oye quieres que elimine un usuario
   try {
     await User.findByIdAndDelete(req.params.id); // Buscare al usuario que me pides

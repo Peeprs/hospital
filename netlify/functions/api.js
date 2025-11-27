@@ -27,8 +27,15 @@ let conn = null; // Se usa para que no hayas varias conecciones a la base de dat
 // Funcion que se encarga de conectar a la base de datos
 async function connectDB() {
   if (!conn) {
-    conn = await mongoose.connect(mongoURI);
-    console.log("MongoDB conectado");
+    try {
+      conn = await mongoose.connect(mongoURI);
+      console.log("MongoDB conectado");
+    } catch (error){
+      console.error("Error conectando a MongoDB (Rejected):", error);
+
+      conn = null;
+      throw error;
+    }
   }
   return conn; // Devuelve la coneccion a la base de datos
 }
